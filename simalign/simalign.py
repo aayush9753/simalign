@@ -23,7 +23,7 @@ LOG = get_logger(__name__)
 
 
 class EmbeddingLoader(object):
-	def __init__(self, model: str="bert-base-multilingual-cased", device=torch.device('cpu'), layer: int=8):
+	def __init__(self, model: str="bert-large-uncased", device=torch.device('cpu'), layer: int=8):
 		TR_Models = {
 			'bert-base-uncased': (BertModel, BertTokenizer),
 			'bert-base-multilingual-cased': (BertModel, BertTokenizer),
@@ -32,6 +32,8 @@ class EmbeddingLoader(object):
 			'roberta-base': (RobertaModel, RobertaTokenizer),
 			'xlm-roberta-base': (XLMRobertaModel, XLMRobertaTokenizer),
 			'xlm-roberta-large': (XLMRobertaModel, XLMRobertaTokenizer),
+      			'bert-large-uncased': (BertModel, BertTokenizer),
+      			'roberta-large': (RobertaModel, RobertaTokenizer),
 		}
 
 		self.model = model
@@ -76,9 +78,11 @@ class EmbeddingLoader(object):
 class SentenceAligner(object):
 	def __init__(self, model: str = "bert", token_type: str = "bpe", distortion: float = 0.0, matching_methods: str = "mai", device: str = "cpu", layer: int = 8):
 		model_names = {
-			"bert": "bert-base-multilingual-cased",
-			"xlmr": "xlm-roberta-base"
-			}
+			#"bert": "bert-base-multilingual-cased",
+			"xlmr": "xlm-roberta-base",
+      			"bert": , "bert-large-uncased",
+      			"roberta": , "roberta-large"
+      }
 		all_matching_methods = {"a": "inter", "m": "mwmf", "i": "itermax", "f": "fwd", "r": "rev"}
 
 		self.model = model
