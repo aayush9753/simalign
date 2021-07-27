@@ -81,7 +81,7 @@ class SentenceAligner(object):
 			#"bert": "bert-base-multilingual-cased",
 			"xlmr": "xlm-roberta-base",
       			"bert":  "bert-large-uncased",
-      			"roberta": , "roberta-large"
+      			"roberta": "roberta-large"
       }
 		all_matching_methods = {"a": "inter", "m": "mwmf", "i": "itermax", "f": "fwd", "r": "rev"}
 
