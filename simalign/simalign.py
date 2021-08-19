@@ -75,7 +75,8 @@ class EmbeddingLoader(object):
 					outputs = self.emb_model(**inputs.to(self.device))[2]  # all the hidden layers
 					token_embeddings = torch.stack(outputs, dim=0)
 					token_embeddings = torch.squeeze(token_embeddings, dim=1)
-				  	token_embeddings = token_embeddings.permute(1,0,2)  # torch.Size([no_of_layers, no_of_bpes, emb_dim])
+				  	token_embeddings = token_embeddings.permute(1,0,2) 
+					# torch.Size([no_of_layers, no_of_bpes, emb_dim])
 					token_vecs_cat = []
 					for token in token_embeddings:
 						cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
