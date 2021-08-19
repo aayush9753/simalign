@@ -28,12 +28,14 @@ class EmbeddingLoader(object):
 			'bert-base-uncased': (BertModel, BertTokenizer),
 			'bert-base-multilingual-cased': (BertModel, BertTokenizer),
 			'bert-base-multilingual-uncased': (BertModel, BertTokenizer),
+			'bert-large-uncased': (BertModel, BertTokenizer),
+			'bert-large-cased': (BertModel, BertTokenizer),
+			
 			'xlm-mlm-100-1280': (XLMModel, XLMTokenizer),
-			'roberta-base': (RobertaModel, RobertaTokenizer),
 			'xlm-roberta-base': (XLMRobertaModel, XLMRobertaTokenizer),
 			'xlm-roberta-large': (XLMRobertaModel, XLMRobertaTokenizer),
-      			'bert-large-uncased': (BertModel, BertTokenizer),
-      			'roberta-large': (RobertaModel, RobertaTokenizer),
+			'roberta-base': (RobertaModel, RobertaTokenizer),
+      			'roberta-large': (RobertaModel, RobertaTokenizer)       # <======================================
 		}
 
 		self.model = model
@@ -78,10 +80,17 @@ class EmbeddingLoader(object):
 class SentenceAligner(object):
 	def __init__(self, model: str = "bert", token_type: str = "bpe", distortion: float = 0.0, matching_methods: str = "mai", device: str = "cpu", layer: int = 8):
 		model_names = {
-			#"bert": "bert-base-multilingual-cased",
-			"xlmr": "xlm-roberta-base",
-      			"bert":  "bert-large-uncased",
-      			"roberta": "roberta-large"
+			"bert_bu": 'bert-base-uncased',  # b = base, u = uncased
+			"bert_bmc": "bert-base-multilingual-cased",  # m = multilingual, c = cased
+			"bert_bmu": "bert-base-multilingual-uncased",  
+			"bert_lu":  "bert-large-uncased",  # l = large
+			"bert_lc":  "bert-large-cased",
+			
+			"xlmr_base": "xlm-roberta-base",
+			"xlmr_large": "xlm-roberta-large",
+			"roberta_base": "roberta-base",
+      			"roberta_large": "roberta-large"  # <======================================
+			 
       }
 		all_matching_methods = {"a": "inter", "m": "mwmf", "i": "itermax", "f": "fwd", "r": "rev"}
 
