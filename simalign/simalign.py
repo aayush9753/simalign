@@ -23,7 +23,7 @@ LOG = get_logger(__name__)
 
 
 class EmbeddingLoader(object):	
-	def __init__(self, model: str="bert-large-uncased", device=torch.device('cpu'), layer: int=8):
+	def __init__(self, model: str="bert-base-multilingual-cased", device=torch.device('cpu'), layer: int=8):
 		TR_Models = {
 			'bert-base-uncased': (BertModel, BertTokenizer),
 			'bert-base-multilingual-cased': (BertModel, BertTokenizer),
