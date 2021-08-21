@@ -113,8 +113,8 @@ class EmbeddingLoader(object):
 					    sum_vec = torch.sum(token[-4:], dim=0)
 					    token_vecs_sum_b.append(sum_vec)
 					
-					outputs_a = torch.stack(token_vecs_cat_a)[np.newaxis, :, :]  # [1, 32, 768])
-					outputs_b = torch.stack(token_vecs_cat_b)[np.newaxis, :, :]  # [1, 32, 768])
+					outputs_a = torch.stack(token_vecs_sum_a)[np.newaxis, :, :]  # [1, 32, 768])
+					outputs_b = torch.stack(token_vecs_sum_b)[np.newaxis, :, :]  # [1, 32, 768])
 					outputs = torch.cat((outputs_a, outputs_b), dim = 0)  # [2, 32, 768]) # torch.Size([2, no_of_bpes, emb_dim])
 				
 				else:
