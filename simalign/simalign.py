@@ -22,7 +22,7 @@ from simalign.utils import get_logger
 LOG = get_logger(__name__)
 
 
-class EmbeddingLoader(object):
+class EmbeddingLoader(object):	
 	def __init__(self, model: str="bert-large-uncased", device=torch.device('cpu'), layer: int=8):
 		TR_Models = {
 			'bert-base-uncased': (BertModel, BertTokenizer),
@@ -74,22 +74,25 @@ class EmbeddingLoader(object):
 				if self.layer == "cat":
 					outputs = self.emb_model(**inputs.to(self.device))[2]  # all the hidden layers
 					token_embeddings = torch.stack(outputs, dim=0)
-					token_embeddings = torch.squeeze(token_embeddings, dim=1).permute(1,0,2) # torch.Size([no_of_layers, no_of_bpes, emb_dim])
+					token_embeddings = torch.squeeze(token_embeddings, dim=1)
+					token_embeddings = token_embeddings.permute(1,0,2)  
+					# torch.Size - no_of_layers, no_of_bpes, emb_dim
+
 					token_vecs_cat = []
 					for token in token_embeddings:
-						cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
+					  	cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
 					  	token_vecs_cat.append(cat_vec)
 					outputs = torch.stack(token_vecs_cat)[np.newaxis, :, :]  # torch.Size([1, no_of_bpes, emb_dim X 4])
 				
 				elif self.layer == "sum":
 					outputs = self.emb_model(**inputs.to(self.device))[2]  # all the hidden layers
 					token_embeddings = torch.stack(outputs, dim=0)  # 
-				  	token_embeddings = torch.squeeze(token_embeddings, dim=1)
-				  	token_embeddings = token_embeddings.permute(1,0,2)  # torch.Size([no_of_layers, no_of_bpes, embedding_size])
+					token_embeddings = torch.squeeze(token_embeddings, dim=1)
+					token_embeddings = token_embeddings.permute(1,0,2)  # torch.Size([no_of_layers, no_of_bpes, embedding_size])
 					token_vecs_sum = []
 					for token in token_embeddings:
 						sum_vec = torch.sum(token[-4:], dim=0)
-					  	token_vecs_sum.append(sum_vec)
+						token_vecs_sum.append(sum_vec)
 					outputs = torch.stack(token_vecs_sum)[np.newaxis, :, :]  # torch.Size([1, no_of_bpes, emb_dim])
 				
 				else:
