@@ -72,31 +72,53 @@ class EmbeddingLoader(object):
 					inputs = self.tokenizer(sent_batch, is_split_into_words=False, padding=True, truncation=True, return_tensors="pt")
 				
 				if self.layer == "cat":
-					outputs = self.emb_model(**inputs.to(self.device))[2]  # all the hidden layers
-					token_embeddings = torch.stack(outputs, dim=0)
-					token_embeddings = torch.squeeze(token_embeddings, dim=1)
-					token_embeddings = token_embeddings.permute(1,0,2)  
-					# torch.Size - no_of_layers, no_of_bpes, emb_dim
-
-					token_vecs_cat = []
-					for token in token_embeddings:
-					  	cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
-					  	token_vecs_cat.append(cat_vec)
-					outputs = torch.stack(token_vecs_cat)[np.newaxis, :, :]  # torch.Size([1, no_of_bpes, emb_dim X 4])
+					outputs = self.emb_model(**inputs.to(self.device))[2]  # all the hidden layers, list of 13 tensors of torch.Size([2, 32, 768])
+					# Exa - No of BPE token = 32, No of Layers = 13 and emb_dim = 768 
+					token_embeddings = torch.stack(outputs, dim=0)  # [13, 2, 32, 768]
+					token_embeddings = token_embeddings.permute(1,0,2,3)  # [2, 13, 32, 768]
+					token_embeddings_a = token_embeddings[0, ...]  # [13, 32, 768]
+					token_embeddings_b = token_embeddings[1, ...]  # [13, 32, 768]
+					token_embeddings_a = token_embeddings[0, ...].permute(1,0,2)  # [32, 13, 768]
+					token_embeddings_b = token_embeddings[1, ...].permute(1,0,2)  # [32, 13, 768]
+					
+					token_vecs_cat_a = []
+					for token in token_embeddings_a:
+					    cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
+					    token_vecs_cat_a.append(cat_vec)
+					token_vecs_cat_b = []
+					for token in token_embeddings_b:
+					    cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
+					    token_vecs_cat_b.append(cat_vec)
+					
+					outputs_a = torch.stack(token_vecs_cat_a)[np.newaxis, :, :]  # [1, 32, 3072])
+					outputs_b = torch.stack(token_vecs_cat_b)[np.newaxis, :, :]  # [1, 32, 3072])
+					outputs = torch.cat((outputs_a, outputs_b), dim = 0)  # [2, 32, 3072]) # torch.Size([2, no_of_bpes, emb_dim X 4])
 				
 				elif self.layer == "sum":
-					outputs = self.emb_model(**inputs.to(self.device))[2]  # all the hidden layers
-					token_embeddings = torch.stack(outputs, dim=0)  # 
-					token_embeddings = torch.squeeze(token_embeddings, dim=1)
-					token_embeddings = token_embeddings.permute(1,0,2)  # torch.Size([no_of_layers, no_of_bpes, embedding_size])
-					token_vecs_sum = []
-					for token in token_embeddings:
-						sum_vec = torch.sum(token[-4:], dim=0)
-						token_vecs_sum.append(sum_vec)
-					outputs = torch.stack(token_vecs_sum)[np.newaxis, :, :]  # torch.Size([1, no_of_bpes, emb_dim])
+					outputs = self.emb_model(**inputs.to(self.device))[2]  # all the hidden layers, list of 13 tensors of torch.Size([2, 32, 768])
+					# Exa - No of BPE token = 32, No of Layers = 13 and emb_dim = 768 
+					token_embeddings = torch.stack(outputs, dim=0)  # [13, 2, 32, 768]
+					token_embeddings = token_embeddings.permute(1,0,2,3)  # [2, 13, 32, 768]
+					token_embeddings_a = token_embeddings[0, ...]  # [13, 32, 768]
+					token_embeddings_b = token_embeddings[1, ...]  # [13, 32, 768]
+					token_embeddings_a = token_embeddings[0, ...].permute(1,0,2)  # [32, 13, 768]
+					token_embeddings_b = token_embeddings[1, ...].permute(1,0,2)  # [32, 13, 768]
+					
+					token_vecs_sum_a = []
+					for token in token_embeddings_a:
+					    sum_vec = torch.sum(token[-4:], dim=0)
+					    token_vecs_sum_a.append(sum_vec)
+					token_vecs_sum_b = []
+					for token in token_embeddings_b:
+					    sum_vec = torch.sum(token[-4:], dim=0)
+					    token_vecs_sum_b.append(sum_vec)
+					
+					outputs_a = torch.stack(token_vecs_cat_a)[np.newaxis, :, :]  # [1, 32, 768])
+					outputs_b = torch.stack(token_vecs_cat_b)[np.newaxis, :, :]  # [1, 32, 768])
+					outputs = torch.cat((outputs_a, outputs_b), dim = 0)  # [2, 32, 768]) # torch.Size([2, no_of_bpes, emb_dim])
 				
 				else:
-					outputs = self.emb_model(**inputs.to(self.device))[2][self.layer]
+					outputs = self.emb_model(**inputs.to(self.device))[2][self.layer]  # [2, 32, 768]) # torch.Size([2, no_of_bpes, emb_dim])
 
 				return outputs[:, 1:-1, :]
 		else:
